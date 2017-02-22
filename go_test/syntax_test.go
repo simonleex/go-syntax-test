@@ -26,3 +26,18 @@ func TestClosedChannel(t *testing.T) {
 	assert.Equal(t, 1, v2)
 	assert.Equal(t, true, ok)
 }
+
+
+
+func TestVariadic(t *testing.T) {
+	f := func (a int, b ...int) int{
+		return len(b)
+	}
+	assert.Equal(t, 0, f(1))
+	assert.Equal(t, 2, f(1,2,3))
+	var b []int
+	b = make([]int, 0)
+	assert.Equal(t, 0, f(1, b... ))
+	b = append(b, 1, 2, 3)
+	assert.Equal(t, 3, f(1, b... ))
+}
