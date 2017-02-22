@@ -133,6 +133,13 @@ func TestDefer(t *testing.T) {
 	}
 
 	assert.Equal(t, 0, c3())
+}
 
-
+func TestSliceCap(t *testing.T)  {
+	sl := make([]int, 5, 6)
+	assert.Equal(t, 5, len(sl))
+	assert.Equal(t, 6, cap(sl))
+	sl1 := []int{1}
+	assert.Equal(t, 1, len(sl1))
+	assert.Equal(t, 1, len(sl1))
 }
