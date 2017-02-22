@@ -36,6 +36,7 @@ func TestVariadic(t *testing.T) {
 	assert.Equal(t, 0, f(1))
 	assert.Equal(t, 2, f(1,2,3))
 	var b []int
+	assert.Nil(t, b)
 	b = make([]int, 0)
 	assert.Equal(t, 0, f(1, b... ))
 	b = append(b, 1, 2, 3)
