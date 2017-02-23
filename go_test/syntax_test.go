@@ -4,6 +4,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"sync"
 	"testing"
+	"encoding/gob"
+	"bytes"
+	"fmt"
 )
 
 func TestClosedChannel(t *testing.T) {
@@ -142,4 +145,54 @@ func TestSliceCap(t *testing.T)  {
 	sl1 := []int{1}
 	assert.Equal(t, 1, len(sl1))
 	assert.Equal(t, 1, len(sl1))
+}
+
+
+func TestBreakLabel(t *testing.T) {
+
+	v := 1
+	Label:
+		for {
+			break Label
+		}
+	assert.Equal(t, 1, v)
+
+
+}
+
+
+func TestForLoop(t *testing.T) {
+	var i,j int
+	for i = 0; i < 10 && j == 0; i ++ {
+		if i == 9 {
+			j = 1
+		}
+	}
+	if i < 10 && j == 0 {
+		println("ddd")
+	}
+	println(i, j)
+
+}
+
+type User struct {
+	Name string
+	id int
+}
+
+
+func TestGob(t *testing.T) {
+	user := User{"test", 1}
+	buf :=  bytes.NewBuffer([]byte{})
+	Enc := gob.NewEncoder(buf)
+	err := Enc.Encode(user)
+	assert.Nil(t, err)
+
+	fmt.Println(buf)
+
+	newuser := User{"new", 2}
+	Dec := gob.NewDecoder(buf)
+	Dec.Decode(&newuser)
+	assert.Equal(t, User{"test", 2}, newuser)
+
 }
