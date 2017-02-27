@@ -7,8 +7,9 @@ import (
 	"encoding/gob"
 	"bytes"
 	"fmt"
+	"math"
+	"os"
 )
-
 func TestClosedChannel(t *testing.T) {
 	ch := make(chan int, 1)
 	//ch <- 1
@@ -22,6 +23,7 @@ func TestClosedChannel(t *testing.T) {
 	v1, ok := <-ch1
 	assert.Equal(t, 1, v1)
 	assert.Equal(t, true, ok)
+
 
 	ch2 := make(chan int, 1)
 	ch2 <- 1
@@ -195,4 +197,30 @@ func TestGob(t *testing.T) {
 	Dec.Decode(&newuser)
 	assert.Equal(t, User{"test", 2}, newuser)
 
+}
+
+func TestString(t *testing.T) {
+	var s string
+	assert.Equal(t, "", s)
+}
+
+func TestIntLimit(t *testing.T) {
+	println(-(math.MaxInt32+1))
+	println(math.MinInt32)
+
+}
+
+
+// os.exit(1) actually can't stop by recover
+func TestOsExitRecover(t *testing.T) {
+	f := func() {
+		defer func() {
+			if err := recover(); err != nil {
+				println(err)
+			}
+		}()
+		os.Exit(1)
+	}
+	f()
+	println("still working")
 }

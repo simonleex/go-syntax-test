@@ -1,21 +1,18 @@
 package main
 
+import (
+	"net/http"
+	"fmt"
+	"runtime"
+)
 
-func consumer(ch chan int, tag int) {
-	for {
-		println(<- ch, tag)
-	}
+
+func handler(resp http.ResponseWriter, req *http.Request) {
+	fmt.Fprintf(resp, "Hello,World")
 }
 
 func main() {
-	ch := make(chan int)
-
-	go consumer(ch, 1)
-	go consumer(ch, 2)
-	go consumer(ch, 3)
-
-	for i := 0; i < 1000; i ++ {
-		ch <- i
-	}
+	http.HandleFunc("/", handler)
+	http.ListenAndServe(":8080", nil)
 
 }
