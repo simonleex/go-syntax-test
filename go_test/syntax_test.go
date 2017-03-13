@@ -1,15 +1,16 @@
-package go_test
+package gotest
 
 import (
-	"github.com/stretchr/testify/assert"
-	"sync"
-	"testing"
-	"encoding/gob"
 	"bytes"
+	"encoding/gob"
 	"fmt"
+	"github.com/stretchr/testify/assert"
 	"math"
 	"os"
+	"sync"
+	"testing"
 )
+
 func TestClosedChannel(t *testing.T) {
 	ch := make(chan int, 1)
 	//ch <- 1
@@ -23,7 +24,6 @@ func TestClosedChannel(t *testing.T) {
 	v1, ok := <-ch1
 	assert.Equal(t, 1, v1)
 	assert.Equal(t, true, ok)
-
 
 	ch2 := make(chan int, 1)
 	ch2 <- 1
@@ -140,7 +140,7 @@ func TestDefer(t *testing.T) {
 	assert.Equal(t, 0, c3())
 }
 
-func TestSliceCap(t *testing.T)  {
+func TestSliceCap(t *testing.T) {
 	sl := make([]int, 5, 6)
 	assert.Equal(t, 5, len(sl))
 	assert.Equal(t, 6, cap(sl))
@@ -149,23 +149,20 @@ func TestSliceCap(t *testing.T)  {
 	assert.Equal(t, 1, len(sl1))
 }
 
-
 func TestBreakLabel(t *testing.T) {
 
 	v := 1
-	Label:
-		for {
-			break Label
-		}
+Label:
+	for {
+		break Label
+	}
 	assert.Equal(t, 1, v)
-
 
 }
 
-
 func TestForLoop(t *testing.T) {
-	var i,j int
-	for i = 0; i < 10 && j == 0; i ++ {
+	var i, j int
+	for i = 0; i < 10 && j == 0; i++ {
 		if i == 9 {
 			j = 1
 		}
@@ -179,13 +176,12 @@ func TestForLoop(t *testing.T) {
 
 type User struct {
 	Name string
-	id int
+	id   int
 }
-
 
 func TestGob(t *testing.T) {
 	user := User{"test", 1}
-	buf :=  bytes.NewBuffer([]byte{})
+	buf := bytes.NewBuffer([]byte{})
 	Enc := gob.NewEncoder(buf)
 	err := Enc.Encode(user)
 	assert.Nil(t, err)
@@ -205,11 +201,10 @@ func TestString(t *testing.T) {
 }
 
 func TestIntLimit(t *testing.T) {
-	println(-(math.MaxInt32+1))
+	println(-(math.MaxInt32 + 1))
 	println(math.MinInt32)
 
 }
-
 
 // os.exit(1) actually can't stop by recover
 func TestOsExitRecover(t *testing.T) {
@@ -223,4 +218,30 @@ func TestOsExitRecover(t *testing.T) {
 	}
 	f()
 	println("still working")
+}
+
+var token = `mutual?agent=grab&token=EAAHVAvYTQm8BAAqZBrdWGNjxU9gwKTWaZBVpZAAK8S3WmAMv3jJg
+jjdZAev71yvPh9fwpbYZAVxE1wxErj6bxJwEaeV80n6xa1oJhrYb8VQtaUcgRZCyVBY3X3CCZAA
+IGkvmpZCvXIW8skuRfG7eSE3t74iZBSJdq7yfT0ZAJoolqLTIqcjXsgBwZAn3zhOO6xxXZCDqzn
+5VtNi4bzMZAHVOZBlljI1RWHly6ZAmyPSTAoOkP1FrqculFhTxWlK
+OyNCvyVgRuijD6WJZC5FEoKFLwZDtual?agent=grab&token=EAAHVAvYTQm8BAAqZBrdWGNjxU9gwKTWaZBVpZAAK8S3WmAMv3jJg
+jjdZAev71yvPh9fwpbYZAVxE1wxErj6bxJwEaeV80n6xa1oJhrYb8VQtaUcgRZCyVBY3X3CCZAA
+IGkvmpZCvXIW8skuRfG7eSE3t74iZBSJdq7yfT0ZAJoolqLTIqcjXsgBwZAn3zhOO6xxXZCDqzn
+kr7ThyJ3CJEv5Ab8VW3kX23p9jNsw5MUuotknTYbZA5hwJzfQHcw6Hr0v0fjn6Ra1VZABReXJaI
+kr7ThyJ3CJEv5Ab8VW3kX23p9jNsw5MUuotknTYbZA5hwJzfQHcw6Hr0v0fjn6Ra1VZABReXJaI
+kr7ThyJ3CJEv5Ab8VW3kX23p9jNsw5MUuotknTYbZA5hwJzfQHcw6Hr0v0fjn6Ra1VZABReXJaI
+kr7ThyJ3CJEv5Ab8VW3kX23p9jNsw5MUuotknTYbZA5hwJzfQHcw6Hr0v0fjn6Ra1VZABReXJaI
+1CcBIzWBW4uprQtCfZAmRWPLO3c8vxkggr7rPWg2ZA4EbwRVClrd45jAZBFhcqzeFZC3omEhuAT
+kr7ThyJ3CJEv5Ab8VW3kX23p9jNsw5MUuotknTYbZA5hwJzfQHcw6Hr0v0fjn6Ra1VZABReXJaI
+kr7ThyJ3CJEv5Ab8VW3kX23p9jNsw5MUuotknTYbZA5hwJzfQHcw6Hr0v0fjn6Ra1VZABReXJaI
+kr7ThyJ3CJEv5Ab8VW3kX23p9jNsw5MUuotknTYbZA5hwJzfQHcw6Hr0v0fjn6Ra1VZABReXJaI
+OyNCvyVgRuijD6WJZC5FEoKFLwZD`
+
+type trans func()
+
+func BenchmarkSha256(b *testing.B) {
+	fmt.Printf("%v\n", len(token))
+	for i := 0; i < b.N; i++ {
+		countProof(token, "grab")
+	}
 }
