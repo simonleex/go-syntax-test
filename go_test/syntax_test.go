@@ -7,8 +7,11 @@ import (
 	"github.com/stretchr/testify/assert"
 	"math"
 	"os"
+	"reflect"
+	"strings"
 	"sync"
 	"testing"
+	"time"
 )
 
 func TestClosedChannel(t *testing.T) {
@@ -244,4 +247,113 @@ func BenchmarkSha256(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		countProof(token, "grab")
 	}
+}
+
+func TestNotNil(t *testing.T) {
+	var chana chan int
+	assert.NotNil(t, chana)
+}
+
+var msg = `mutual?agent=grab&token=EAAHVAvYTQm8BAAqZBrdWGNjxU9gwKTWaZBVpZAAK8S3WmAMv3jJg
+jjdZAev71yvPh9fwpbYZAVxE1wxErj6bxJwEaeV80n6xa1oJhrYb8VQtaUcgRZCyVBY3X3CCZAA
+IGkvmpZCvXIW8skuRfG7eSE3t74iZBSJdq7yfT0ZAJoolqLTIqcjXsgBwZAn3zhOO6xxXZCDqzn
+5VtNi4bzMZAHVOZBlljI1RWHly6ZAmyPSTAoOkP1FrqculFhTxWlK
+OyNCvyVgRuijD6WJZC5FEoKFLwZDtual?agent=grab&token=EAAHVAvYTQm8BAAqZBrdWGNjxU9gwKTWaZBVpZAAK8S3WmAMv3jJg
+jjdZAev71yvPh9fwpbYZAVxE1wxErj6bxJwEaeV80n6xa1oJhrYb8VQtaUcgRZCyVBY3X3CCZAA
+IGkvmpZCvXIW8skuRfG7eSE3t74iZBSJdq7yfT0ZAJoolqLTIqcjXsgBwZAn3zhOO6xxXZCDqzn
+kr7ThyJ3CJEv5Ab8VW3kX23p9jNsw5MUuotknTYbZA5hwJzfQHcw6Hr0v0fjn6Ra1VZABReXJaI
+kr7ThyJ3CJEv5Ab8VW3kX23p9jNsw5MUuotknTYbZA5hwJzfQHcw6Hr0v0fjn6Ra1VZABReXJaI
+kr7ThyJ3CJEv5Ab8VW3kX23p9jNsw5MUuotknTYbZA5hwJzfQHcw6Hr0v0fjn6Ra1VZABReXJaI
+kr7ThyJ3CJEv5Ab8VW3kX23p9jNsw5MUuotknTYbZA5hwJzfQHcw6Hr0v0fjn6Ra1VZABReXJaI
+1CcBIzWBW4uprQtCfZAmRWPLO3c8vxkggr7rPWg2ZA4EbwRVClrd45jAZBFhcqzeFZC3omEhuAT
+kr7ThyJ3CJEv5Ab8VW3kX23p9jNsw5MUuotknTYbZA5hwJzfQHcw6Hr0v0fjn6Ra1VZABReXJaI
+kr7ThyJ3CJEv5Ab8VW3kX23p9jNsw5MUuotknTYbZA5hwJzfQHcw6Hr0v0fjn6Ra1VZABReXJaI
+kr7ThyJ3CJEv5Ab8VW3kX23p9jNsw5MUuotknTYbZA5hwJzfQHcw6Hr0v0fjn6Ra1VZABReXJaI
+OyNCvyVgRuijD6WJZC5FEoKFLwZD`
+
+var entity = msg + "-" + "123456789"
+
+func BenchmarkT1(b *testing.B) {
+	result := ""
+	for i := 0; i < b.N; i++ {
+		if strings.HasPrefix(entity, msg) {
+			msgs := strings.Split(entity, "-")
+			msgNum := len(msgs)
+			msgID := msgs[msgNum-1]
+			if len(entity) == len(msg)+1+len(msgID) {
+				result = msgID
+			}
+		}
+	}
+	_ = result
+}
+
+func BenchmarkT2(b *testing.B) {
+	result := ""
+	for i := 0; i < b.N; i++ {
+		if strings.HasPrefix(entity, msg) {
+			msgs := strings.Split(entity, "-")
+			msgNum := len(msgs)
+			msgID := msgs[msgNum-1]
+			result = msgID
+		}
+	}
+	_ = result
+}
+
+func TestParseID(t *testing.T) {
+
+	msgID := ""
+	for i := len(entity) - 1; i >= 0; i-- {
+		if entity[i:i+1] == "-" {
+			msgID = entity[i+1:]
+			break
+		}
+	}
+	assert.NotEqual(t, "", msgID)
+	assert.Equal(t, "123456789", msgID)
+}
+
+type server interface {
+	pull()
+	push()
+}
+
+type ATEST struct {
+	a int
+}
+
+type Ser struct {
+}
+
+func (s *Ser) pull() {
+	println("Ser pull")
+}
+
+func (s *Ser) push() {
+	println("Ser push")
+}
+
+type Ser1 struct {
+	Ser
+}
+
+
+func (s1 *Ser1) push() {
+	println("Ser1 push")
+}
+
+func TestReflect(t *testing.T) {
+	a := ATEST{1}
+	var b interface{}
+	b = a
+	fmt.Printf("%v\n", reflect.TypeOf(b).Name())
+	fmt.Printf("%d\n", time.Millisecond*10)
+
+	var s server
+	s1 := &Ser1{}
+	s = s1
+	s.pull()
+	s.push()
+
 }
