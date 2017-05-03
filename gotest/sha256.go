@@ -6,6 +6,11 @@ import (
 	"encoding/hex"
 )
 
+type AB struct {
+	a int
+	B int
+}
+
 func countProof(token, secret string) (string, error) {
 	mac := hmac.New(sha256.New, []byte(secret))
 	_, err := mac.Write([]byte(token))

@@ -338,7 +338,6 @@ type Ser1 struct {
 	Ser
 }
 
-
 func (s1 *Ser1) push() {
 	println("Ser1 push")
 }
@@ -356,4 +355,53 @@ func TestReflect(t *testing.T) {
 	s.pull()
 	s.push()
 
+}
+
+func TestFanIn(t *testing.T) {
+	buffer := make(chan int, 5)
+	for i := 0; i < 5; i++ {
+		go func(i int, b chan int) {
+			for k := range b {
+				println(i, k)
+			}
+		}(i, buffer)
+	}
+
+	for i := 0; i < 100; i++ {
+		buffer <- i
+	}
+	close(buffer)
+}
+
+func TestWgWaitAndTimeout(t *testing.T) {
+	wg := sync.WaitGroup{}
+	wg.Add(1)
+
+	go func() {
+		time.Sleep(3 * time.Second)
+		wg.Done()
+	}()
+
+	doneChan := make(chan struct{})
+	go func() {
+		defer close(doneChan)
+		wg.Wait()
+		println("wait")
+	}()
+	select {
+	case <-doneChan:
+		println("done")
+	case <-time.After(5 * time.Second):
+		println("timeout")
+	}
+}
+
+var commonInt = []int{4, 5, 6}
+
+func fun1(a, b int, c ...int) {
+	println(a, b, c)
+}
+
+func TestVardic(t *testing.T) {
+	fun1(1, 2, commonInt...)
 }
