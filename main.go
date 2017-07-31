@@ -3,7 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/simonleex/go_test/gotest"
+	"gopkg.in/mgo.v2"
 )
 
 type Request struct {
@@ -69,5 +69,29 @@ func main() {
 
 	str := fmt.Sprintf("%v %s", 123, "321")
 	println(str)
+
+	testMgo()
+}
+
+type Book struct {
+	ID   int32
+	Name string
+}
+
+func testMgo() {
+	DBSess, err := mgo.Dial("localhost")
+	if err != nil {
+		fmt.Printf("%v", err)
+		return
+	}
+
+	DBSess.SetMode(mgo.Monotonic, true)
+	DB := DBSess.DB("test").C("book")
+	err = DB.Insert(&Book{1, "abc"}, &Book{2, "robot"})
+	if err != nil {
+		fmt.Printf("%v", err)
+		return
+	}
+	DBSess.Close()
 
 }

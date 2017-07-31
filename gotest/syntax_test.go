@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/gob"
 	"fmt"
+	"github.com/myteksi/go/messaging/grab-messaging/common/errors"
 	"github.com/stretchr/testify/assert"
 	"math"
 	"os"
@@ -244,9 +245,6 @@ type trans func()
 
 func BenchmarkSha256(b *testing.B) {
 	fmt.Printf("%v\n", len(token))
-	for i := 0; i < b.N; i++ {
-		countProof(token, "grab")
-	}
 }
 
 func TestNotNil(t *testing.T) {
@@ -404,4 +402,93 @@ func fun1(a, b int, c ...int) {
 
 func TestVardic(t *testing.T) {
 	fun1(1, 2, commonInt...)
+}
+
+func TestPrint(t *testing.T) {
+	a := 0x10000000
+	println(a)
+
+}
+
+type e struct {
+}
+
+func (*e) Error() string { return "boom" }
+func f() *e              { return nil }
+
+// PushNotificationRequest defines push notification request
+type PushNotificationRequest struct {
+	Sender        string                 `json:"sender"`
+	Event         string                 `json:"event"`
+	Message       string                 `json:"title"`
+	MessageType   interface{}            `json:"messageType"`
+	Body          string                 `json:"body"`
+	Recipients    []int64                `json:"recipients"`
+	RecipientType string                 `json:"recipientType"`
+	PushData      map[string]interface{} `json:"pushData"`
+}
+
+func TestPrintln(t *testing.T) {
+	err := errors.New("ys")
+	err = f()
+	println(err == nil)
+
+	push := PushNotificationRequest{
+		Sender:      "sender",
+		Event:       "event",
+		MessageType: "type200",
+		Recipients:  []int64{1, 2, 3},
+		PushData:    map[string]interface{}{"yes": "yes", "no": 1},
+	}
+
+	fmt.Printf("%v\n", push)
+
+	c := make(chan int, 2)
+	c <- 1
+	c <- 2
+	<-c
+	close(c)
+	fmt.Println(<-c)
+
+}
+
+func TestTimeWait(t *testing.T) {
+	for i := 0; i <= 100; i++ {
+		fmt.Printf("i:%d\n", i)
+		if i%10 != 0 {
+			continue
+		}
+
+		<-time.After(time.Second * 3)
+	}
+}
+
+const (
+	factor = 5
+)
+
+func TestMaxInt32Mod(t *testing.T) {
+	var count int32 = 0
+	count = math.MaxInt32 - 50
+	for i := 0; i <= 100; i++ {
+		count += 1
+		if count%factor == 0 {
+			fmt.Printf("i:%d count:%d\n", i, count)
+		}
+	}
+	var f float32 = 16777216 // 1 << 24
+	fmt.Printf("%v %v %v\n", f, f+1, f == f+1)
+}
+
+type TestTagStruct struct {
+	Test int `json:"jtag" fuck:"nofuck"`
+}
+
+func TestTag(t *testing.T) {
+	a := TestTagStruct{}
+	tyo := reflect.TypeOf(a)
+	fi := tyo.Field(0)
+	loup, err := fi.Tag.Lookup("json")
+	fmt.Printf("%v %v %v %v\n", loup, err, fi.Tag.Get("json"), fi.Tag.Get("fuck"))
+
 }
