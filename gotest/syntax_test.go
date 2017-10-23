@@ -492,3 +492,238 @@ func TestTag(t *testing.T) {
 	fmt.Printf("%v %v %v %v\n", loup, err, fi.Tag.Get("json"), fi.Tag.Get("fuck"))
 
 }
+
+var testSlice = []int{5, 6, 7, 8}
+
+func TestRangeSlice(t *testing.T) {
+	for i, j := range testSlice {
+		fmt.Printf("%v %v", i, j)
+	}
+
+}
+
+func TestMapAndConvert(t *testing.T) {
+	m := map[string]interface{}{
+		"a": true,
+		"b": 1,
+	}
+
+	res, ok := m["a"].(bool)
+	fmt.Printf("%v %v", res, ok)
+
+}
+
+func TestOperatorMul(t *testing.T) {
+	a := 2
+	b := 3
+	c := 8
+	c *= b - a
+	fmt.Printf("%v", c)
+
+}
+
+func TestCutSlice(t *testing.T) {
+	s := []int{1, 2, 3, 4, 5}
+	subs1 := s[2:4]
+	fmt.Printf("%v %v", s, subs1)
+	s[3] = 10
+	assert.Equal(t, 10, subs1[1])
+}
+
+func TestCopySlice(t *testing.T) {
+	s := []int{1, 2, 3, 4, 5}
+	s1 := make([]int, 3, 5)
+	copy(s1, s[2:5])
+	s1[1] = 10
+	s2 := s1[1:3]
+	s2[1] = 1111
+	s3 := append(s1, 6)
+	s3[1] = 7
+	fmt.Printf("%v %v %v %v", s, s1, s2, s3)
+}
+
+func TestSliceExpand(t *testing.T) {
+	s := []int{1, 2, 3, 4, 5}
+	s1 := s[2:5]
+	s = append(s, 8)
+	s1[1] = 111
+	fmt.Printf("%v %v %v", s, s1, s)
+}
+
+func TestHappenedBefore(t *testing.T) {
+	var wg sync.WaitGroup
+	var count int
+	var ch = make(chan bool, 1)
+	for i := 0; i < 1005; i++ {
+		wg.Add(1)
+		go func() {
+			ch <- true
+			fmt.Printf("%v\n", count)
+			count++
+			count--
+			<-ch
+			wg.Done()
+		}()
+	}
+	wg.Wait()
+	fmt.Printf("%v", count)
+}
+
+func TestMapRetrieve(t *testing.T) {
+	m := make(map[int]map[int]int)
+	m[1] = make(map[int]int)
+	m[1][1] = 1
+	m[1][0] = 1
+	x, y := m[1][2]
+	fmt.Printf("%v %v\n", x, y)
+	x, y = m[2][1]
+	fmt.Printf("%v %v\n", x, y)
+	if m[3] == nil {
+		fmt.Printf("nil")
+	}
+
+}
+
+type testtc struct {
+	a, b int
+}
+
+func TestTypeConversion(t *testing.T) {
+	a := 1
+	b := float32(a)
+	fmt.Printf("%v %v ", a, b)
+}
+
+func (t *testtc) add1() {
+
+}
+
+func (t *testtc) add2() {
+
+}
+
+type adder interface {
+	add1()
+}
+
+type adderplus interface {
+	add1()
+	add2()
+}
+
+func TestTypeAssertion(t *testing.T) {
+	var x adderplus
+	x = &testtc{}
+	x.add1()
+	y := x.(adder)
+	y.add1()
+	fmt.Printf("%v", string(6767))
+
+}
+
+func TestAssignAbility(t *testing.T) {
+	var x chan int
+	var y <-chan int
+	y = x
+	_ = y
+}
+
+func TestConstantAssign(t *testing.T) {
+	var a float32
+	var b float64
+	var c int32
+	var d int64
+	const untyped = 1
+	a = untyped
+	b = untyped
+	c = untyped
+	d = untyped
+	_, _, _, _ = a, b, c, d
+}
+
+type testano struct {
+	a int
+}
+
+type record struct {
+	testtc
+	testano
+}
+
+func (t *testano) add1() {
+
+}
+
+func TestAnonymousFieldFunc(t *testing.T) {
+	a := &testtc{}
+	a.add1()
+	a.add2()
+	var b adder
+	b = a
+	b.add1()
+	v := reflect.ValueOf(b)
+	fmt.Printf("%v", v)
+}
+
+func TestBreakLabel1(t *testing.T) {
+	for i := 0; i < 10; i++ {
+	OuterLoop:
+		for j := 0; j < 10; j++ {
+			fmt.Printf("i=%v, j=%v\n", i, j)
+			break OuterLoop
+		}
+	}
+	gotest := 2
+	fmt.Printf("%v", gotest)
+}
+
+var (
+	a int = b + 1
+	b int = 1
+)
+
+func TestInitVar(t *testing.T) {
+	fmt.Println(a)
+	fmt.Println(b)
+}
+
+type Employee struct {
+	id     int
+	salary int
+}
+
+func EmployeeByID(id int) *Employee { return &Employee{10, 10} }
+
+func TestPointArray(t *testing.T) {
+	x := []*record{}
+	fmt.Printf("%v\n", x)
+}
+
+func TestReturnValue(t *testing.T) {
+	x := fmt.Errorf("asd")
+	fmt.Printf("%v", x)
+}
+
+func p(i int) {
+	print(i + 10)
+}
+
+func myrecover() {
+	print("4")
+	if r := recover(); r != nil {
+		fmt.Printf("rec %v", r)
+	}
+	print("5")
+}
+
+func TestPanicFlow(t *testing.T) {
+
+	defer p(1)
+	defer myrecover()
+	print("1")
+	panic("panic")
+	print("2")
+	defer p(2)
+	print("3")
+	defer p(3)
+}
