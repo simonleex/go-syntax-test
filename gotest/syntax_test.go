@@ -727,3 +727,17 @@ func TestPanicFlow(t *testing.T) {
 	print("3")
 	defer p(3)
 }
+
+func return2() (int, int) {
+	return 1, 2
+}
+
+func return3() (int, int) {
+	return return2()
+}
+
+func TestGC(t *testing.T) {
+	a, b := return3()
+
+	fmt.Printf("%d %p %v", a, b, &b)
+}
